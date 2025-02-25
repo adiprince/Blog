@@ -1,10 +1,11 @@
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import BlogPost, Comment
 from .serializers import BlogPostSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Blog Post Views
 class BlogPostListCreateView(generics.ListCreateAPIView):
@@ -87,3 +88,19 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+# Filter Views
+class BlogPostFilterView(generics.ListAPIView):
+    serializer_class = BlogPostSerializer
+    queryset = BlogPost.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['author']
+    ordering_fields = ['created_at']  # Allows ordering by date
+
+    def get_queryset(self):
+        """Override queryset to filter by date if provided."""
+        queryset = super().get_queryset()
+        date = self.request.query_params.get('date')
+        if date:
+            queryset = queryset.filter(created_at__date=date)
+        return queryset

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BlogPostListCreateView, BlogPostDetailView, CommentListCreateView, CommentDetailView
+from .views import BlogPostListCreateView, BlogPostDetailView, CommentListCreateView, CommentDetailView, BlogPostFilterView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -10,4 +10,8 @@ urlpatterns = [
     # Comment endpoints
     path('posts/<int:post_id>/comments/', CommentListCreateView.as_view(), name='comment-list'),
     path('comments/<int:pk>/', CommentDetailView.as_view(), name='comment-detail'),
+
+    # Filter endpoints
+    path('posts/filter/', BlogPostFilterView.as_view(), name='post-filter'),
+
 ]
